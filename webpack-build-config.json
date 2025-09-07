@@ -1,0 +1,27 @@
+{
+  "build": {
+    "clientPath": "/home/dogay.kamar@canonical.com/Desktop/indicodev/indico-plugin-custom-profile-fields/indico_custom_profile_fields/client",
+    "distPath": "/home/dogay.kamar@canonical.com/Desktop/indicodev/indico-plugin-custom-profile-fields/indico_custom_profile_fields/static/dist",
+    "distURL": "/static/plugins/custom_profile_fields/dist/",
+    "indicoSourcePath": "/home/dogay.kamar@canonical.com/Desktop/indicodev/src",
+    "rootPath": "/home/dogay.kamar@canonical.com/Desktop/indicodev/indico-plugin-custom-profile-fields/indico_custom_profile_fields",
+    "staticPath": "/home/dogay.kamar@canonical.com/Desktop/indicodev/indico-plugin-custom-profile-fields/indico_custom_profile_fields/static",
+    "staticURL": "/static/plugins/custom_profile_fields/",
+    "urlMapPath": "/home/dogay.kamar@canonical.com/Desktop/indicodev/indico-plugin-custom-profile-fields/url_map.json"
+  },
+  "indico": {
+    "build": {
+      "baseURLPath": "/",
+      "clientPath": "/home/dogay.kamar@canonical.com/Desktop/indicodev/src/indico/web/client",
+      "distPath": "/home/dogay.kamar@canonical.com/Desktop/indicodev/src/indico/web/static/dist",
+      "distURL": "/dist/",
+      "rootPath": "/home/dogay.kamar@canonical.com/Desktop/indicodev/src/indico",
+      "staticPath": "/home/dogay.kamar@canonical.com/Desktop/indicodev/src/indico/web/static",
+      "staticURL": "/",
+      "urlMapPath": "/home/dogay.kamar@canonical.com/Desktop/indicodev/src/url_map.json"
+    }
+  },
+  "isPlugin": true,
+  "plugin": "custom_profile_fields",
+  "themes": {}
+}

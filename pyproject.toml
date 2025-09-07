@@ -1,0 +1,36 @@
+[project]
+name = 'indico-plugin-custom-profile-fields'
+description = 'Indico plugin to add admin-defined custom fields to user profiles'
+readme = 'README.md'
+version = '0.1'
+license = 'MIT'
+authors = [{ name = 'Doğay Kamar', email = 'dogay.kamar@canonical.com' }]
+requires-python = '>=3.12.2, <3.13'
+dependencies = ['indico>=3.3.6']
+
+[project.entry-points.'indico.plugins']
+custom_profile_fields = 'indico_custom_profile_fields.plugin:CustomProfileFieldsPlugin'
+
+[build-system]
+requires = ['hatchling==1.27.0']
+build-backend = 'hatchling.build'
+
+[tool.hatch.build]
+packages = ['indico_custom_profile_fields']
+exclude = [
+    '*.no-header',
+    '.keep',
+    # exclude original client sources (they are all included in source maps anyway)
+    'indico_*/client/',
+    # no need for tests outside development
+    'test_snapshots/',
+    'tests/',
+    '*_test.py',
+]
+artifacts = [
+    'indico_*/static/dist/',
+]
+
+[tool.hatch.build.targets.sdist.hooks.custom]
+path = '../hatch_build.py'
+dependencies = ['babel==2.16.0']

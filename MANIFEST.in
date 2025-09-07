@@ -1,0 +1,2 @@
+recursive-include indico_customprofilefields/models *
+recursive-include indico_customprofilefields/migrations *
