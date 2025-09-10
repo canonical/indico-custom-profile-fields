@@ -31988,6 +31988,54 @@
         }
       ]
     },
+    "event_registration.api_checkin_registration_custom_qr_code": {
+      "endpoint": "event_registration.api_checkin_registration_custom_qr_code",
+      "rules": [
+        {
+          "args": [],
+          "converters": {},
+          "defaults": {},
+          "trace": [
+            {
+              "data": "|",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "api",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "checkin",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "ticket",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "custom-qr-code",
+              "isDynamic": false
+            }
+          ]
+        }
+      ]
+    },
     "event_registration.api_checkin_registration_uuid": {
       "endpoint": "event_registration.api_checkin_registration_uuid",
       "rules": [
@@ -68251,5 +68299,5 @@
       ]
     }
   },
-  "version": "609e1e83c7e1c378378d4d458f328ef5"
+  "version": "5a704a0de2d120f580108a959b1ae843"
 }

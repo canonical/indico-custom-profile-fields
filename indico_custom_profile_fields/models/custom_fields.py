@@ -1,6 +1,12 @@
+#!/usr/bin/env python3
+
+# Copyright 2025 Canonical Ltd.
+# See LICENSE file for licensing details.
+
 """Database model for custom profile fields."""
 
 from indico.core.db import db
+from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.users.models.users import User
 from indico.util.string import format_repr
 
@@ -30,6 +36,7 @@ class UserCustomProfile(db.Model):
     dietary_options = db.Column(db.JSON, nullable=True)
     dietary_details = db.Column(db.Text, nullable=True)
     cap_details = db.Column(db.Text, nullable=True)
+    country = db.Column(db.String, nullable=True)
 
     # Relationships
     user = db.relationship(
@@ -65,45 +72,3 @@ class UserCustomProfile(db.Model):
         if not profile:
             profile = cls(user=user)
         return profile
-
-    # def has_data(self):
-    #     """Check if any custom fields have data."""
-    #     fields = [self.country]
-    #     return any(field for field in fields if field)
-
-    # def to_dict(self):
-    #     """Convert to dictionary for API/export."""
-    #     return {
-    #         "country": self.country,
-    #     }
-
-    # def update_from_dict(self, data):
-    #     """Update fields from dictionary."""
-    #     for field in [
-    #         "country",
-    #     ]:
-    #         if field in data:
-    #             setattr(self, field, data[field] or None)
-
-
-class CustomFieldMapping(db.Model):
-    __tablename__ = "custom_field_mapping"
-    __table_args__ = {"schema": "plugin_custom_profile_fields"}
-
-    id = db.Column(db.Integer, primary_key=True)
-    regform_id = db.Column(
-        db.Integer,
-        db.ForeignKey("event_registration.forms.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True,
-    )
-    field_name = db.Column(db.String, nullable=False)
-    field_id = db.Column(db.String, nullable=False)
-    field_surname = db.Column(db.String, nullable=True)
-
-    __table_args__ = (
-        db.UniqueConstraint("regform_id", "field_name", name="uq_custom_field_mapping"),
-    )
-
-    def __repr__(self):
-        return format_repr(self, "regform_id", "field_name", "field_id")

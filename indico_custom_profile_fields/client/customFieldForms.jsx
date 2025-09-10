@@ -1,3 +1,6 @@
+// Copyright 2025 Canonical Ltd.
+// See LICENSE file for licensing details.
+
 import React from 'react';
 import {
   FinalField,
@@ -5,120 +8,88 @@ import {
   FinalDropdown,
   parsers as p,
 } from 'indico/react/forms';
-import {
-  SyncedFinalAffiliationDropdown,
-  SyncedFinalInput,
-  SyncedFinalTextArea,
-} from 'indico/react/components/syncedInputs';
 import {Translate} from 'indico/react/i18n';
-import {
-  tshirtOptions,
-  dietaryOptions,
-} from './options';
+import customFields from './custom_fields.json';
 
-function MultiCheckboxComponent({value, onChange}) {
-  const selected = Array.isArray(value) ? value : [];
-  const toggle = v =>
-    onChange(selected.includes(v) ? selected.filter(x => x !== v) : [...selected, v]);
 
-  return (
-    <div>
-      {dietaryOptions.map(opt => (
-        <label key={opt.id} style={{display: 'block', cursor: 'pointer'}}>
-          <input
-            type="checkbox"
-            checked={selected.includes(opt.id)}
-            onChange={() => toggle(opt.id)}
-          />{' '}
-          {opt.caption}
-        </label>
-      ))}
-    </div>
-  );
-}
-
-export default function CustomFields({userValues, syncedValues, lockedFields, lockedFieldMessage}) {
-  // const {countries} = useSelector(getStaticData);
-
+/*
+  Renders custom fields based on the configuration in custom_fields.json
+  Supports text, textarea, single_choice (dropdown), and multi_choice (checkboxes)
+  fields.
+*/
+export default function CustomFields() {
   return (
     <>
-      <FinalInput
-        name="legal_name"
-        label={Translate.string('Legal Name')}
-        type="text"
-        required={true}
-      />
-      <FinalInput
-        name="pronouns"
-        label={Translate.string('Pronouns')}
-        type="text"
-        required={false}
-        description={
-          Translate.string(
-            "Please add any pronouns you would like printed on your "+
-            "name badge In the format She/Her, He/Him, They/Them"
-          )
+      {customFields.map(field => {
+        if (field.input_type === 'text' || field.input_type === 'textarea') {
+          return (
+            <FinalInput
+              key={field.name}
+              name={field.name}
+              label={Translate.string(field.title)}
+              type={field.input_type}
+              required={field.is_required}
+              description={field.description ? Translate.string(field.description) : undefined}
+            />
+          );
         }
-      />
-      <FinalInput
-        name="nickname"
-        label={Translate.string('Nickname (MM/irc)')}
-        type="text"
-        required={false}
-        description={
-          Translate.string(
-            "As you would like this printed on your name badge"
-          )
+
+        if (field.input_type === 'single_choice') {
+          return (
+            <FinalDropdown
+              key={field.name}
+              name={field.name}
+              label={Translate.string(field.title)}
+              options={field.choices.map(c => ({key: c.id, value: c.id, text: c.caption}))}
+              selection
+              parse={p.nullIfEmpty}
+              placeholder={Translate.string('None')}
+              required={field.is_required}
+            />
+          );
         }
-      />
-      <FinalInput
-        name="employee_id"
-        label={Translate.string('Employee ID')}
-        type="text"
-        required={true}
-      />
-      <FinalInput
-        name="group"
-        label={Translate.string('Group')}
-        type="text"
-      />
-      <FinalInput
-        name="product"
-        label={Translate.string('Product')}
-        type=""
-        description={
-          Translate.string(
-            'Please confirm how your team name should be formatted on your name badge ' +
-            'with your manager, for consistency.'
-          )
+
+        if (field.input_type === 'multi_choice') {
+          return (
+            <FinalField
+              key={field.name}
+              name={field.name}
+              label={Translate.string(field.title)}
+              component={({value, onChange}) => (
+                <div>
+                  {(field.choices || []).map(opt => (
+                    <label
+                      key={opt.id}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                        gap: '0.4em'
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={(value || []).includes(opt.id)}
+                        onChange={() =>
+                          onChange(
+                            (value || []).includes(opt.id)
+                              ? (value || []).filter(v => v !== opt.id)
+                              : [...(value || []), opt.id]
+                          )
+                        }
+                      />
+                      {opt.caption}
+                    </label>
+                  ))}
+                </div>
+              )}
+              parse={x => x}
+            />
+          );
         }
-      />
-      <FinalDropdown
-        name="shirt_size"
-        label={Translate.string('T-Shirt Size')}
-        options={tshirtOptions}
-        selection
-        parse={p.nullIfEmpty}
-        placeholder={Translate.string('None', 'Title (salutation)')}
-        required={true}
-      />
-      <FinalField
-        name="dietary_options"
-        label={Translate.string('Dietary Options')}
-        component={MultiCheckboxComponent}
-        // keep arrays as-is
-        parse={x => x}
-      />
-      <FinalInput
-        name="dietary_details"
-        label={Translate.string('Allergy/Dietary Details')}
-        type="text"
-      />
-      <FinalInput
-        name="cap_details"
-        label={Translate.string('CAP Details')}
-        type="textarea"
-      />
+
+        return null;
+      })}
     </>
   );
 }

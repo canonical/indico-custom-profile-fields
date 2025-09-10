@@ -1,53 +1,46 @@
-from flask import flash, redirect, render_template, render_template_string, request
+#!/usr/bin/env python3
+
+# Copyright 2025 Canonical Ltd.
+# See LICENSE file for licensing details.
+
+import json
+import os
+
+from flask import request
 from indico.core import signals
 from indico.core.db import db
-from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint
-from indico.modules.events.registration.controllers.display import RHRegistrationForm
+from indico.core.plugins import IndicoPlugin
 from indico.modules.events.registration.models.form_fields import (
     RegistrationFormField,
     RegistrationFormFieldData,
 )
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.models.items import (
-    RegistrationFormItemType,
-    RegistrationFormSection,
-)
 from indico.modules.events.registration.util import get_user_data
 from indico.modules.users.controllers import (
-    RHPersonalData,
     RHPersonalDataUpdate,
     UserPersonalDataSchema,
 )
 from indico.util.signals import interceptable_sender
-from indico.web.flask.util import url_for
-from indico.web.forms.base import IndicoForm
-from indico.web.views import WPBase
-from wtforms.fields import StringField
-from wtforms.validators import Optional
 
-from indico_custom_profile_fields.models.custom_fields import (
-    CustomFieldMapping,
-    UserCustomProfile,
-)
-
-from .fields_list import custom_fields
-
-# from indico_custom_profile_fields.models.field_mapping import CustomFieldMapping
+from indico_custom_profile_fields.models.custom_fields import UserCustomProfile
+from indico_custom_profile_fields.models.field_mapping import CustomFieldMapping
 
 
 class CustomProfileFieldsPlugin(IndicoPlugin):
     """Custom Profile Test Plugin"""
 
-    custom_fields = custom_fields
-
     def init(self):
+        """
+        Initialize the custom profile fields plugin.
+        This method sets up the plugin by injecting necessary JavaScript,
+        loading custom field definitions, and connecting to relevant signals
+        to handle profile page pre-filling, profile updates, and registration form
+        creation.
+        """
         super().init()
         self.inject_bundle("main.js")
-
+        self.custom_fields = self._load_custom_fields()
         # Hook into profile page to prefill custom fields
-        # signals.rh.before_process.connect(
-        #     self._prefill_custom_fields, sender=RHPersonalData
-        # )
         signals.plugin.schema_post_dump.connect(
             self._prefill_custom_fields, sender=UserPersonalDataSchema
         )
@@ -58,43 +51,21 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
         # Hook into registration form to add custom fields
         signals.event.registration_form_created.connect(self._after_form_creation)
 
-        # Debugging - remove later
-        # signals.plugin.schema_post_dump.connect(self._print_schema_info)
-        # signals.plugin.schema_post_load.connect(self._print_schema_info)
-        # signals.plugin.schema_pre_load.connect(self._print_schema_info)
-        # signals.rh.process.connect(self._print_rh_info, sender=RHRegistrationForm)
+        # Intercept get_user_data to inject custom profile fields into registration
         self.connect(
             signals.plugin.interceptable_function,
             self._get_user_data,
             sender=interceptable_sender(get_user_data),
         )
-        signals.event.registration_created.connect(self._check_reg)
 
-    def _check_reg(self, sender, **kwargs):
-        print("New registration created")
-        print(f"Sender: {sender}")
-        print(f"Kwargs: {kwargs}")
-        # Access registration data
-
-    def _get_user_data1(self, sender, func, args, **kwargs):
-        print("Intercepted get_user_data call")
-        print(f"Sender: {sender}")
-        print(f"Args: {args}")
-        print(f"Kwargs: {kwargs}")
-        _, user, _ = args.args
-        print(args.args[1])
-        print(user)
-        print(user is args.args[1])
-        print(func)
-        user_data = func(*args.args, **args.kwargs)
-        # Populate the country field with the user's data
-        print(user_data)
-        print(user_data)
-        return user_data
+    def _load_custom_fields(self):
+        """Load custom fields from JSON file."""
+        json_path = os.path.join(os.path.dirname(__file__), "client/custom_fields.json")
+        with open(json_path) as f:
+            return json.load(f)
 
     def _get_user_data(self, sender, func, args, **kwargs):
-        print("Intercepted get_user_data call")
-
+        """Inject custom profile fields into registration user data."""
         # Call the original function to get the base data
         user_data = func(*args.args, **args.kwargs)
 
@@ -106,23 +77,18 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
 
         # Fetch custom profile
         custom_profile = UserCustomProfile.get_for_user(user)
-        print(user)
-        print(custom_profile)
         if not custom_profile:
-            print("No custom profile found for user")
             return user_data
         mappings = {
             m.field_name: m.field_id
-            for m in CustomFieldMapping.query.filter_by(regform_id=sender.id)
+            for m in CustomFieldMapping.query.filter_by(regform_id=args.args[0].id)
         }
-        print(custom_profile.legal_name)
-        print(mappings)
 
         # Inject custom fields into user_data
         for field_def in self.custom_fields:
             field_name = field_def["name"]  # e.g. "employee_id"
+            field_type = field_def["input_type"]
             field_id = mappings.get(field_name)  # e.g. "field_347"
-            print(field_name, field_id)
 
             if not field_id:
                 # The field was not created in the regform
@@ -131,29 +97,31 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
             if hasattr(custom_profile, field_name):
                 value = getattr(custom_profile, field_name)
                 if value is not None:
-                    user_data[field_id] = value
-
-        print("Final user_data with custom fields:", user_data)
+                    if field_type == "single_choice":
+                        # Single choice fields expect a dict with the selected id as key
+                        user_data[field_id] = {value: 1}
+                    elif field_type == "multi_choice":
+                        # Multi choice fields expect a dict with selected ids as keys
+                        if isinstance(value, list):
+                            user_data[field_id] = {v: 1 for v in value}
+                        else:
+                            user_data[field_id] = {value: 1}
+                    else:
+                        # Other fields can be set directly
+                        user_data[field_id] = value
         return user_data
 
     def _after_profile_update(self, sender, result, **kwargs):
         """Handle custom profile field updates after personal data update."""
         # Get the form data from the request
-        print(sender)
-        print(result)
-        print(f" Kwargs: {kwargs}")
-        print(kwargs.get("rh"))
-        print(request.json)
-        print(request.form)
         if sender is not RHPersonalDataUpdate:
             print("Not a personal data update request, skipping.")
             return
         formData = request.json
-        rh = kwargs.get("rh")
-
-        # Check if test field is present in the form data
+        rh = kwargs.get("rh")  # type: RHPersonalDataUpdate
         customProfile = None
         isDataNew = False
+        # Iterate over custom fields and update the user's custom profile
         for field_meta in self.custom_fields:
             field_name = field_meta["name"]
             if field_name in formData:
@@ -162,7 +130,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
                     customProfile = UserCustomProfile.get_for_user(rh.user)
                     print(customProfile)
 
-                # Update the test field
+                # Update the field
                 setattr(customProfile, field_name, formData[field_name])
 
         # Save to database if there were changes
@@ -171,7 +139,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
             db.session.commit()
 
     def _prefill_custom_fields(self, sender, **kwargs):
-        rh = kwargs.get("rh")
+        """Hook: Prefill custom fields on the profile page."""
         user = kwargs.get("orig")[0]
         custom_profile = UserCustomProfile.get_for_user(user)
         if not custom_profile:
@@ -206,8 +174,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
                         {
                             "id": c.get("id"),
                             "caption": c["caption"],
-                            "is_deleted": False,
-                            "is_disabled": False,
+                            "is_enabled": True,
                         }
                         for c in field_meta.get("choices", [])
                     ],
@@ -228,37 +195,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
             db.session.add(
                 CustomFieldMapping(
                     regform_id=sender.id,
-                    field_name=field_meta[
-                        "name"
-                    ],  # your logical name, e.g. "dietary_options"
-                    field_id=field.html_field_name,  # "field_347" etc
+                    field_name=field_meta["name"],
+                    field_id=field.html_field_name,
                 )
             )
-
-    # def _after_form_creation(self, sender: RegistrationForm, **kwargs):
-    #     print(isinstance(sender, RegistrationForm))
-    #     print(sender)
-    #     print(sender.sections)
-    #     print(sender.event)
-    #     print(sender.form_items)
-    #     print(sender.active_fields)
-    #     print(sender.active_labels)
-    #     print(f" Kwargs: {kwargs}")
-
-    #     # Example: add a custom text field
-    #     print(sender.sections)
-    #     section_to_add = sender.sections[0]
-    #     field1 = RegistrationFormField(
-    #         registration_form=sender,
-    #         parent=section_to_add,
-    #         title="GitHub Username",
-    #         input_type="text",
-    #         is_required=False,
-    #         position=1,
-    #     )
-    #     field1.data, versioned_data = field1.field_impl.process_field_data({})
-    #     field1.current_data = RegistrationFormFieldData(versioned_data=versioned_data)
-    #     section_to_add.children.append(field1)
-    #     db.session.flush()
-    #     print(field1.id)
-    #     print(field1.html_field_name)
