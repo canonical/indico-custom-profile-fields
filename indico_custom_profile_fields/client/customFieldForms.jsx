@@ -11,7 +11,6 @@ import {
 import {Translate} from 'indico/react/i18n';
 import customFields from './custom_fields.json';
 
-
 /*
   Renders custom fields based on the configuration in custom_fields.json
   Supports text, textarea, single_choice (dropdown), and multi_choice (checkboxes)

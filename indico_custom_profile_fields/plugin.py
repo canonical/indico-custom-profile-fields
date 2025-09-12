@@ -27,7 +27,7 @@ from indico_custom_profile_fields.models.field_mapping import CustomFieldMapping
 
 
 class CustomProfileFieldsPlugin(IndicoPlugin):
-    """Custom Profile Test Plugin"""
+    """Custom Profile Fields Plugin"""
 
     def init(self):
         """
