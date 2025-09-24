@@ -48,7 +48,7 @@ class UserCustomProfile(db.Model):
     )
 
     def __repr__(self):
-        """String representation."""
+        """Return string representation."""
         return format_repr(
             self,
             "id",

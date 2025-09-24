@@ -23,6 +23,7 @@ header:
     - '**/*.txt'
     - '**/*.xml'
     - '**/*.js'
+    - '**/*.js.map'
     - '**/*.jsx'
     - '.codespellignore'
     - '.dockerignore'
@@ -41,4 +42,7 @@ header:
     - 'lib/**'
     - 'poetry.lock'
     - 'pytest.ini'
+    - 'MANIFEST.in'
+    - 'pyproject.toml'
+
   comment: on-failure

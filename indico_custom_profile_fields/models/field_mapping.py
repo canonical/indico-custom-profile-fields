@@ -41,4 +41,5 @@ class CustomFieldMapping(db.Model):
     )
 
     def __repr__(self):
+        """Return string representation."""
         return format_repr(self, "regform_id", "field_name", "field_id")

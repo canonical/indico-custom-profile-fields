@@ -3,6 +3,26 @@
 # Copyright 2025 Canonical Ltd.
 # See LICENSE file for licensing details.
 
+"""
+Indico Custom Profile Fields Plugin
+
+This plugin allows the addition of custom profile fields to user profiles
+and registration forms within the Indico event management system. It currently
+supports the following custom fields:
+- Legal Name (text)
+- Pronouns (text)
+- Nickname (text)
+- Shirt Size (single choice)
+- Employee ID (text)
+- Group (text)
+- Product (text)
+- Dietary Options (multi choice)
+- Dietary Details (text)
+- Cap Details (text)
+These fields are automatically added to new registration forms and can be
+prefilled on user profile pages. The plugin also handles saving updates to
+these fields when users update their personal data.
+"""
 import json
 import os
 
@@ -27,7 +47,7 @@ from indico_custom_profile_fields.models.field_mapping import CustomFieldMapping
 
 
 class CustomProfileFieldsPlugin(IndicoPlugin):
-    """Custom Profile Fields Plugin"""
+    """Custom Profile Fields Plugin."""
 
     def init(self):
         """
@@ -37,6 +57,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
         to handle profile page pre-filling, profile updates, and registration form
         creation.
         """
+
         super().init()
         self.inject_bundle("main.js")
         self.custom_fields = self._load_custom_fields()
@@ -139,7 +160,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
             db.session.commit()
 
     def _prefill_custom_fields(self, sender, **kwargs):
-        """Hook: Prefill custom fields on the profile page."""
+        """Hook that prefills custom fields on the profile page."""
         user = kwargs.get("orig")[0]
         custom_profile = UserCustomProfile.get_for_user(user)
         if not custom_profile:
@@ -150,7 +171,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
                 kwargs["data"][0][field_name] = getattr(custom_profile, field_name)
 
     def _after_form_creation(self, sender: RegistrationForm, **kwargs):
-        """Hook: Add custom fields when a new registration form is created."""
+        """Hook that adds custom fields to new registration forms."""
 
         section_to_add = sender.sections[0]
 
