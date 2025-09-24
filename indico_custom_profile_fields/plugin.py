@@ -4,7 +4,7 @@
 # See LICENSE file for licensing details.
 
 """
-Indico Custom Profile Fields Plugin
+Indico Custom Profile Fields Plugin.
 
 This plugin allows the addition of custom profile fields to user profiles
 and registration forms within the Indico event management system. It currently
@@ -52,12 +52,12 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
     def init(self):
         """
         Initialize the custom profile fields plugin.
+
         This method sets up the plugin by injecting necessary JavaScript,
         loading custom field definitions, and connecting to relevant signals
         to handle profile page pre-filling, profile updates, and registration form
         creation.
         """
-
         super().init()
         self.inject_bundle("main.js")
         self.custom_fields = self._load_custom_fields()
@@ -160,7 +160,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
             db.session.commit()
 
     def _prefill_custom_fields(self, sender, **kwargs):
-        """Hook that prefills custom fields on the profile page."""
+        """Prefill custom fields on the profile page."""
         user = kwargs.get("orig")[0]
         custom_profile = UserCustomProfile.get_for_user(user)
         if not custom_profile:
@@ -171,8 +171,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
                 kwargs["data"][0][field_name] = getattr(custom_profile, field_name)
 
     def _after_form_creation(self, sender: RegistrationForm, **kwargs):
-        """Hook that adds custom fields to new registration forms."""
-
+        """Add custom fields to new registration forms."""
         section_to_add = sender.sections[0]
 
         for idx, field_meta in enumerate(self.custom_fields, start=1):
