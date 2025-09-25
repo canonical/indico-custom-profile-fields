@@ -21,7 +21,7 @@ branch_labels = None
 depends_on = None
 
 
-def upgrade():
+def upgrade() -> None:
     """Create new user_custom_profiles table and schema."""
     op.execute(CreateSchema("plugin_custom_profile_fields"))
     op.create_table(
@@ -58,7 +58,7 @@ def upgrade():
     # ### end Alembic commands ###
 
 
-def downgrade():
+def downgrade() -> None:
     """Drop user_custom_profiles table and schema."""
     op.drop_index(
         op.f("ix_user_custom_profiles_user_id"),

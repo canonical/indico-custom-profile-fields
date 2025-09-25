@@ -20,7 +20,7 @@ branch_labels = None
 depends_on = None
 
 
-def upgrade():
+def upgrade() -> None:
     """Create new custom_field_mapping table."""
     op.create_table(
         "custom_field_mapping",
@@ -49,7 +49,7 @@ def upgrade():
     # ### end Alembic commands ###
 
 
-def downgrade():
+def downgrade() -> None:
     """Drop custom_field_mapping table."""
     op.drop_index(
         op.f("ix_custom_field_mapping_regform_id"),
