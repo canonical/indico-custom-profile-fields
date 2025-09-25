@@ -126,7 +126,12 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
                         user_data[field_id] = value
         return user_data
 
-    def _after_profile_update(self, sender: RHPersonalDataUpdate, _: Any, **kwargs: Any) -> None:
+    def _after_profile_update(
+        self,
+        sender: RHPersonalDataUpdate,
+        result: Any,  # pylint: disable=unused-argument
+        **kwargs: Any,
+    ) -> None:
         """Handle custom profile field updates after personal data update."""
         # Get the form data from the request
         if sender is not RHPersonalDataUpdate:
@@ -165,7 +170,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
             if hasattr(custom_profile, field_name):
                 kwargs["data"][0][field_name] = getattr(custom_profile, field_name)
 
-    def _after_form_creation(self, sender: RegistrationForm, _: Any) -> None:
+    def _after_form_creation(self, sender: RegistrationForm, **_: Any) -> None:
         """Add custom fields to new registration forms."""
         section_to_add = sender.sections[0]
 
