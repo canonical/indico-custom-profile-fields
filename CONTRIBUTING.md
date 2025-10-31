@@ -1,11 +1,12 @@
+
 # Contributing
 
-This document explains the processes and practices recommended for contributing enhancements to the Indico Custom Profile Plugin.
+This document explains the processes and practices recommended for contributing enhancements to the Indico custom profile fields plugin
 
 ## Overview
 
 - Generally, before developing enhancements to this plugin, you should consider [opening an issue
-  ](https://github.com/canonical/indico-custom-profile-fields/issues) explaining your use case.
+  ](https://github.com/canonical/discourse-k8s-operator/issues) explaining your use case.
 - If you would like to chat with us about your use-cases or proposed implementation, you can reach
   us at [Canonical Matrix public channel](https://matrix.to/#/#charmhub-charmdev:ubuntu.com)
   or [Discourse](https://discourse.charmhub.io/).
@@ -23,12 +24,11 @@ This document explains the processes and practices recommended for contributing 
 When contributing, you must abide by the
 [Ubuntu Code of Conduct](https://ubuntu.com/community/ethos/code-of-conduct).
 
-## Releases and versions
-
-This project uses [semantic versioning](https://semver.org/).
+## Changelog
 
 Please ensure that any new feature, fix, or significant change is documented by
-adding an entry to the [CHANGELOG.md](https://charmhub.io/discourse-k8s/docs/changelog) file.
+adding an entry to the [CHANGELOG.md](https://github.com/canonical/indico-custom-profile-fields/blob/main/changelog.md) file. Use the date of the
+contribution as the header for new entries.
 
 To learn more about changelog best practices, visit [Keep a Changelog](https://keepachangelog.com/).
 
@@ -65,7 +65,7 @@ your pull request must provide the following details:
   if your pull request does not change the module.
 
 - **Library Changes**: Describe any changes made to the library,
-  or "None" if the library is not affected.
+  or "None" is the library is not affected.
 
 - **Checklist**: Complete the following items:
 
@@ -81,7 +81,7 @@ we use the [Canonical contributor license agreement](https://assets.ubuntu.com/v
 
 #### Canonical contributor agreement
 
-Canonical welcomes contributions to the Discourse charm. Please check out our
+Canonical welcomes contributions to the Indico custom profile fields plugin. Please check out our
 [contributor agreement](https://ubuntu.com/legal/contributors) if you're interested in contributing to the solution.
 
 The CLA sign-off is simple line at the
@@ -96,7 +96,7 @@ To add signatures on your commits, follow the
 
 ## Develop
 
-To make contributions to this plugin, you'll need a working
+To make contributions to this plugin, you'll need a working 
 [Indico development setup](https://docs.getindico.io/en/stable/installation/development/).
 
 The code for this plugin can be downloaded as follows:
@@ -105,7 +105,8 @@ The code for this plugin can be downloaded as follows:
 git clone https://github.com/canonical/indico-custom-profile-fields
 ```
 
-You can create an environment for development with `python3-venv`:
+You can create an environment for development with `python3-venv`.
+We will also install `tox` inside the virtual environment for testing:
 
 ```bash
 sudo apt install python3-venv
@@ -114,12 +115,10 @@ source venv/bin/activate
 pip install tox
 ```
 
-Install `tox` inside the virtual environment for testing.
-
 ### Test
 
 This project uses `tox` for managing test environments. There are some pre-configured environments
-that can be used for linting and formatting code when you're preparing contributions to the charm:
+that can be used for linting and formatting code when you're preparing contributions to the plugin:
 
 * ``tox``: Executes all of the basic checks and tests (``lint``, ``fmt``).
 * ``tox -e fmt``: Runs formatting using ``black`` and ``isort``.
