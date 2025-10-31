@@ -1,4 +1,4 @@
-# Indico Custom Profile Fields Plugin
+# Indico custom profile fields plugin
 
 This plugin adds new custom fields to the profile, and extends them to the event registration forms. Currently, it adds the following fields:
 
@@ -27,12 +27,16 @@ This plugin adds new custom fields to the profile, and extends them to the event
 
 Currently, the only user information stored in the database are the fields in the profile page and only those fields come prefilled to the event registration form. However, the listed fields above are also requested in every event registration form, and the users have to re-enter these details at every event as the information provided are not stored in the Indico's database. With this plug-in, these new fields will be available to be updated in the profile page, and users will be able to update these fields in their profile page, and they will be prefilled in the event registration forms.
 
-## How It Works
+## How it works
+
+In this section, the working principle of the plugin is detailed.
 
 ### Profile page
+
 The plugin adds the listed fields to the profile page, and the necessary models in the database so that the users can update their profile with these fields, and the information will be stored.
 
-## Registration Form
+## Registration form
+
 When an admin creates a registration form, the added fields are automatically added and enabled in the form, and are associated with the profile page fields. The admin will only need to add any additional fields they require and open the registration. Then, when a user visit the registration form, the added fields are going to be pre-filled with the information from their profile page, avoiding re-entering these information at every event.
 
 ## Installation
