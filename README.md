@@ -35,7 +35,7 @@ In this section, the working principle of the plugin is detailed.
 
 The plugin adds the listed fields to the profile page, and the necessary models in the database so that the users can update their profile with these fields, and the information will be stored.
 
-## Registration form
+## Registration Form
 
 When an admin creates a registration form, the added fields are automatically added and enabled in the form, and are associated with the profile page fields. The admin will only need to add any additional fields they require and open the registration. Then, when a user visit the registration form, the added fields are going to be pre-filled with the information from their profile page, avoiding re-entering these information at every event.
 
