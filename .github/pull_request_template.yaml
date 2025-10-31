@@ -8,10 +8,6 @@ Applicable spec: <link>
 
 <!-- The reason the change is needed -->
 
-### Juju Events Changes
-
-<!-- Any changes to the juju events being observed (newly added, significantly modified or deleted) -->
-
 ### Module Changes
 
 <!-- Any high level changes to modules and why (Service, Observer, helper) -->
