@@ -6,7 +6,7 @@ version = '1.0.0'
 license = 'MIT'
 authors = [{ name = 'Doğay Kamar', email = 'dogay.kamar@canonical.com' }]
 requires-python = '>=3.12.2, <3.13'
-dependencies = ['indico>=3.3.6']
+dependencies = ['indico>=3.3.8']
 
 [project.entry-points.'indico.plugins']
 custom_profile_fields = 'indico_custom_profile_fields.plugin:CustomProfileFieldsPlugin'

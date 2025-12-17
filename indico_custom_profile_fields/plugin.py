@@ -38,9 +38,10 @@ from indico.modules.events.registration.models.form_fields import (
 )
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import RegistrationFormSection
-from indico.modules.events.registration.models.registrations import Registration, RegistrationData
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import get_user_data
 from indico.modules.users.controllers import RHPersonalDataUpdate, UserPersonalDataSchema
+from indico.modules.users.models.users import User
 from indico.util.countries import get_countries
 from indico.util.signals import interceptable_sender
 
@@ -53,7 +54,12 @@ blueprint = Blueprint(
 
 
 @blueprint.route("/api/config")
-def get_config_api():
+def get_config_api() -> Any:
+    """Return configuration for custom profile fields.
+
+    Returns:
+        JSON response
+    """
     # get_countries() returns {'US': 'United States', ...}
     # We convert it to a list of dicts for JSON
     countries = [{"code": code, "name": name} for code, name in get_countries().items()]
@@ -61,8 +67,7 @@ def get_config_api():
     countries.sort(key=lambda x: x["name"])
     # Check if current user is Admin
     # session.user is the logged-in user. We check if they are an admin.
-    is_admin = session.user and session.user.is_admin
-    print(f"User is admin: {is_admin}")
+    is_admin = session.user and session.user.is_admin  # type: ignore[attr-defined]
 
     return jsonify({"countries": countries, "is_admin": is_admin})
 
@@ -71,6 +76,11 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
     """Custom Profile Fields Plugin."""
 
     def get_blueprints(self) -> Blueprint:
+        """Get the blueprint for the plugin.
+
+        Returns:
+            Blueprint: The blueprint object for the plugin.
+        """
         return blueprint
 
     def init(self) -> None:
@@ -84,12 +94,17 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
         super().init()
         self.inject_bundle("main.js")
         self.custom_fields = self._load_custom_fields()
+
+        # PROFILE PAGE HOOKS #
         # Hook into profile page to prefill custom fields
         signals.plugin.schema_post_dump.connect(
             self._prefill_custom_fields, sender=UserPersonalDataSchema
         )
         # Hook into profile update to handle custom field updates
         signals.rh.process.connect(self._after_profile_update, sender=RHPersonalDataUpdate)
+
+        # REGISTRATION FORM HOOKS #
+
         # Hook into registration form to add custom fields
         signals.event.registration_form_created.connect(self._after_form_creation)
 
@@ -99,29 +114,66 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
             self._get_user_data,
             sender=interceptable_sender(get_user_data),
         )
-        # TEST ( remove later )
-        signals.event.registration_created.connect(self._test_regs)
+        # Hook into registration creation to attach admin-only data
+        signals.event.registration_created.connect(self._attach_admin_data)
 
-    def _test_regs(self, registration: Registration, **kwargs) -> None:
+    def _prefill_custom_fields(self, _: Any, **kwargs: Any) -> None:
+        """Prefill custom fields on the profile page."""
+        orig = cast(list[Any], kwargs.get("orig"))
+        user = orig[0]
+        custom_profile = self._get_custom_user_profile(user)
+        if not custom_profile:
+            return
+        for field_meta in self.custom_fields:
+            field_name = field_meta["name"]
+            if hasattr(custom_profile, field_name):
+                kwargs["data"][0][field_name] = getattr(custom_profile, field_name)
+
+    def _after_profile_update(
+        self,
+        sender: RHPersonalDataUpdate,
+        result: Any,  # pylint: disable=unused-argument
+        **kwargs: Any,
+    ) -> None:
+        """Handle custom profile field updates after personal data update."""
+        # Get the form data from the request
+        if sender is not RHPersonalDataUpdate:
+            print("Not a personal data update request, skipping.")
+            return
+        form_data = cast(dict, request.json)
+        rh = kwargs.get("rh")  # type: RHPersonalDataUpdate
+        custom_profile: UserCustomProfile | None = None
+        is_data_new = False
+        # Iterate over custom fields and update the user's custom profile
+        for field_meta in self.custom_fields:
+            field_name = field_meta["name"]
+            if field_name in form_data:
+                is_data_new = True
+                if not custom_profile:
+                    custom_profile = self._get_custom_user_profile(rh.user)
+
+                # Update the field
+                setattr(custom_profile, field_name, form_data[field_name])
+
+        # Save to database if there were changes
+        if is_data_new:
+            db.session.add(custom_profile)
+            db.session.commit()
+
+    def _attach_admin_data(self, registration: Registration, **_: Any) -> None:
         """Silently attach admin-only data after registration is created."""
-
         user = registration.user
         if not user:
             print("No user found, skipping custom profile injection")
             return
 
         # Fetch custom profile
-        custom_profile = UserCustomProfile.get_for_user(user)
+        custom_profile = self._get_custom_user_profile(user)
         if not custom_profile:
             return
 
         # Get field mappings
-        mappings = {
-            m.field_name: m.field_id
-            for m in CustomFieldMapping.query.filter_by(
-                regform_id=registration.registration_form_id
-            )
-        }
+        mappings = self._get_field_mappings(registration.registration_form_id)
 
         for field_def in self.custom_fields:
             # We ONLY care about Admin fields here
@@ -147,24 +199,9 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
                 continue
 
             # Format data according to field type
-            if field_def["input_type"] in ("single_choice", "country"):
-                # Single Choice must be stored as {'choice_id': 1}
-                formatted_data = {value: 1}
-            elif field_def["input_type"] == "multi_choice":
-                if isinstance(value, list):
-                    formatted_data = {v: 1 for v in value}
-                else:
-                    formatted_data = {value: 1}
-            else:
-                formatted_data = value
+            formatted_value = self._format_value(value, field_def["input_type"])
             # Update the registration data
-            target_data_entry.data = formatted_data
-
-    def _load_custom_fields(self) -> list[dict]:
-        """Load custom fields from JSON file."""
-        json_path = os.path.join(os.path.dirname(__file__), "client/custom_fields.json")
-        with open(json_path, encoding="utf-8") as f:
-            return json.load(f)
+            target_data_entry.data = formatted_value
 
     def _get_user_data(self, _: Any, func: Callable, args: Any, **__: Any) -> dict:
         """Inject custom profile fields into registration user data."""
@@ -178,13 +215,10 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
             return user_data
 
         # Fetch custom profile
-        custom_profile = UserCustomProfile.get_for_user(user)
+        custom_profile = self._get_custom_user_profile(user)
         if not custom_profile:
             return user_data
-        mappings = {
-            m.field_name: m.field_id
-            for m in CustomFieldMapping.query.filter_by(regform_id=args.args[0].id)
-        }
+        mappings = self._get_field_mappings(args.args[0].id)
 
         # Inject custom fields into user_data
         for field_def in self.custom_fields:
@@ -203,65 +237,12 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
             if hasattr(custom_profile, field_name):
                 value = getattr(custom_profile, field_name)
                 if value is not None:
-                    if field_type == "single_choice":
-                        # Single choice fields expect a dict with the id as key
-                        user_data[field_id] = {value: 1}
-                    elif field_type == "multi_choice":
-                        # Multi choice fields expect a dict with ids as keys
-                        if isinstance(value, list):
-                            user_data[field_id] = {v: 1 for v in value}
-                        else:
-                            user_data[field_id] = {value: 1}
-                    elif field_type == "country":
+                    if field_type == "country":
                         # Country has a unique way of passing value
                         user_data["country"] = value
                     else:
-                        # Other fields can be set directly
-                        user_data[field_id] = value
+                        user_data[field_id] = self._format_value(value, field_type)
         return user_data
-
-    def _after_profile_update(
-        self,
-        sender: RHPersonalDataUpdate,
-        result: Any,  # pylint: disable=unused-argument
-        **kwargs: Any,
-    ) -> None:
-        """Handle custom profile field updates after personal data update."""
-        # Get the form data from the request
-        if sender is not RHPersonalDataUpdate:
-            print("Not a personal data update request, skipping.")
-            return
-        form_data = cast(dict, request.json)
-        rh = kwargs.get("rh")  # type: RHPersonalDataUpdate
-        custom_profile: UserCustomProfile | None = None
-        is_data_new = False
-        # Iterate over custom fields and update the user's custom profile
-        for field_meta in self.custom_fields:
-            field_name = field_meta["name"]
-            if field_name in form_data:
-                is_data_new = True
-                if not custom_profile:
-                    custom_profile = UserCustomProfile.get_for_user(rh.user)
-
-                # Update the field
-                setattr(custom_profile, field_name, form_data[field_name])
-
-        # Save to database if there were changes
-        if is_data_new:
-            db.session.add(custom_profile)
-            db.session.commit()
-
-    def _prefill_custom_fields(self, _: Any, **kwargs: Any) -> None:
-        """Prefill custom fields on the profile page."""
-        orig = cast(list[Any], kwargs.get("orig"))
-        user = orig[0]
-        custom_profile = UserCustomProfile.get_for_user(user)
-        if not custom_profile:
-            return
-        for field_meta in self.custom_fields:
-            field_name = field_meta["name"]
-            if hasattr(custom_profile, field_name):
-                kwargs["data"][0][field_name] = getattr(custom_profile, field_name)
 
     def _after_form_creation(self, sender: RegistrationForm, **_: Any) -> None:
         """Add custom fields to new registration forms."""
@@ -337,3 +318,50 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
                     field_id=field.html_field_name,
                 )
             )
+
+    # HELPERS #
+
+    def _load_custom_fields(self) -> list[dict]:
+        """Load custom fields from JSON file."""
+        json_path = os.path.join(os.path.dirname(__file__), "client/custom_fields.json")
+        with open(json_path, encoding="utf-8") as f:
+            return json.load(f)
+
+    def _format_value(self, value: str | list[str], input_type: str) -> str | dict:
+        """Format a value based on its input type.
+
+        Args:
+            value (str): The value to format.
+            input_type (str): The type of input (e.g., 'single_choice', 'multi_choice', 'country').
+
+        Returns:
+            str: The formatted value.
+        """
+        if input_type == "single_choice":
+            # Single Choice must be stored as {'choice_id': 1}
+            return {value: 1}
+        if input_type == "multi_choice":
+            # Multi Choice must be stored as {'choice_id': 1, ...}
+            if isinstance(value, list):
+                return {v: 1 for v in value}
+            return {value: 1}
+        return cast(str, value)
+
+    def _get_custom_user_profile(self, user: User) -> UserCustomProfile | None:
+        """Get custom profile for a user.
+
+        Arguments:
+            user: The user to fetch from DB.
+
+        Returns:
+            UserCustomProfile or None if user does not exist.
+        """
+        custom_user = UserCustomProfile.get_for_user(user)
+        return custom_user
+
+    def _get_field_mappings(self, regform_id: int) -> dict[str, str]:
+        """Get custom field mappings for a registration form."""
+        return {
+            m.field_name: m.field_id
+            for m in CustomFieldMapping.query.filter_by(regform_id=regform_id)
+        }
