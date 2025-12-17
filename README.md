@@ -2,7 +2,9 @@
 
 This plugin adds new custom fields to the profile, and extends them to the event registration forms. Currently, it adds the following fields:
 
-- Legal name
+- Legal First Name
+
+- Legal Last Name
 
 - Pronouns
 
@@ -13,6 +15,8 @@ This plugin adds new custom fields to the profile, and extends them to the event
 - Group
     
 - Product
+
+- Country (Single choice Dropdown)
     
 - T-shirt Size (Single choice Dropdown) 
     

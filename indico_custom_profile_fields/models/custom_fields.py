@@ -16,7 +16,8 @@ class UserCustomProfile(db.Model):
     Attributes:
         id: Primary key.
         user_id: Foreign key to the users table.
-        legal_name: Legal name of the user.
+        legal_first: Legal first name of the user.
+        legal_last: Legal last name of the user.
         pronouns: Pronouns of the user.
         nickname: Nickname of the user.
         employee_id: Employee ID of the user.
@@ -40,7 +41,8 @@ class UserCustomProfile(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.users.id"), nullable=False, index=True)
 
     # Custom fields
-    legal_name = db.Column(db.String, nullable=True)
+    legal_first = db.Column(db.String, nullable=True)
+    legal_last = db.Column(db.String, nullable=True)
     pronouns = db.Column(db.String, nullable=True)
     nickname = db.Column(db.String, nullable=True)
     employee_id = db.Column(db.String, nullable=True)
@@ -74,7 +76,8 @@ class UserCustomProfile(db.Model):
             self,
             "id",
             "user_id",
-            "legal_name",
+            "legal_first",
+            "legal_last",
             "group",
             "product",
             _text=self.user.full_name if self.user else None,

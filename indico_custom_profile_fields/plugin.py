@@ -8,11 +8,13 @@
 This plugin allows the addition of custom profile fields to user profiles
 and registration forms within the Indico event management system. It currently
 supports the following custom fields:
-- Legal Name (text)
+- Legal First Name (text)
+- Legal Last Name (text)
 - Pronouns (text)
 - Nickname (text)
 - Shirt Size (single choice)
 - Employee ID (text)
+- Country (single choice)
 - Group (text)
 - Product (text)
 - Dietary Options (multi choice)
@@ -26,7 +28,7 @@ import json
 import os
 from typing import Any, Callable, cast
 
-from flask import request
+from flask import Blueprint, jsonify, request, session
 from indico.core import signals
 from indico.core.db import db
 from indico.core.plugins import IndicoPlugin
@@ -35,16 +37,41 @@ from indico.modules.events.registration.models.form_fields import (
     RegistrationFormFieldData,
 )
 from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.items import RegistrationFormSection
+from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.modules.events.registration.util import get_user_data
 from indico.modules.users.controllers import RHPersonalDataUpdate, UserPersonalDataSchema
+from indico.util.countries import get_countries
 from indico.util.signals import interceptable_sender
 
 from indico_custom_profile_fields.models.custom_fields import UserCustomProfile
 from indico_custom_profile_fields.models.field_mapping import CustomFieldMapping
 
+blueprint = Blueprint(
+    "plugin_custom_profile_fields", __name__, url_prefix="/plugin/custom_profile_fields"
+)
+
+
+@blueprint.route("/api/config")
+def get_config_api():
+    # get_countries() returns {'US': 'United States', ...}
+    # We convert it to a list of dicts for JSON
+    countries = [{"code": code, "name": name} for code, name in get_countries().items()]
+    # Sort alphabetically by name so they appear nicely in the dropdown
+    countries.sort(key=lambda x: x["name"])
+    # Check if current user is Admin
+    # session.user is the logged-in user. We check if they are an admin.
+    is_admin = session.user and session.user.is_admin
+    print(f"User is admin: {is_admin}")
+
+    return jsonify({"countries": countries, "is_admin": is_admin})
+
 
 class CustomProfileFieldsPlugin(IndicoPlugin):
     """Custom Profile Fields Plugin."""
+
+    def get_blueprints(self) -> Blueprint:
+        return blueprint
 
     def init(self) -> None:
         """Initialize the custom profile fields plugin.
@@ -72,6 +99,66 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
             self._get_user_data,
             sender=interceptable_sender(get_user_data),
         )
+        # TEST ( remove later )
+        signals.event.registration_created.connect(self._test_regs)
+
+    def _test_regs(self, registration: Registration, **kwargs) -> None:
+        """Silently attach admin-only data after registration is created."""
+
+        user = registration.user
+        if not user:
+            print("No user found, skipping custom profile injection")
+            return
+
+        # Fetch custom profile
+        custom_profile = UserCustomProfile.get_for_user(user)
+        if not custom_profile:
+            return
+
+        # Get field mappings
+        mappings = {
+            m.field_name: m.field_id
+            for m in CustomFieldMapping.query.filter_by(
+                regform_id=registration.registration_form_id
+            )
+        }
+
+        for field_def in self.custom_fields:
+            # We ONLY care about Admin fields here
+            if not field_def.get("is_disabled", False):
+                continue
+
+            field_name = field_def["name"]
+            field_id_str = mappings.get(field_name)
+
+            if not field_id_str or not hasattr(custom_profile, field_name):
+                continue
+
+            field_id = int(field_id_str.split("_")[-1])  # Extract numeric ID from "field_123"
+
+            value = getattr(custom_profile, field_name)
+            if value is None:
+                continue
+
+            target_data_entry = next(
+                (d for d in registration.data if d.field_data.field_id == field_id), None
+            )
+            if not target_data_entry:
+                continue
+
+            # Format data according to field type
+            if field_def["input_type"] in ("single_choice", "country"):
+                # Single Choice must be stored as {'choice_id': 1}
+                formatted_data = {value: 1}
+            elif field_def["input_type"] == "multi_choice":
+                if isinstance(value, list):
+                    formatted_data = {v: 1 for v in value}
+                else:
+                    formatted_data = {value: 1}
+            else:
+                formatted_data = value
+            # Update the registration data
+            target_data_entry.data = formatted_data
 
     def _load_custom_fields(self) -> list[dict]:
         """Load custom fields from JSON file."""
@@ -101,11 +188,15 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
 
         # Inject custom fields into user_data
         for field_def in self.custom_fields:
+            if field_def.get("is_disabled", False):
+                # Skip admin-only fields
+                continue
+
             field_name = field_def["name"]  # e.g. "employee_id"
             field_type = field_def["input_type"]
             field_id = mappings.get(field_name)  # e.g. "field_347"
 
-            if not field_id:
+            if field_type != "country" and not field_id:
                 # The field was not created in the regform
                 continue
 
@@ -121,6 +212,9 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
                             user_data[field_id] = {v: 1 for v in value}
                         else:
                             user_data[field_id] = {value: 1}
+                    elif field_type == "country":
+                        # Country has a unique way of passing value
+                        user_data["country"] = value
                     else:
                         # Other fields can be set directly
                         user_data[field_id] = value
@@ -148,7 +242,6 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
                 is_data_new = True
                 if not custom_profile:
                     custom_profile = UserCustomProfile.get_for_user(rh.user)
-                    print(custom_profile)
 
                 # Update the field
                 setattr(custom_profile, field_name, form_data[field_name])
@@ -172,20 +265,47 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
 
     def _after_form_creation(self, sender: RegistrationForm, **_: Any) -> None:
         """Add custom fields to new registration forms."""
-        section_to_add = sender.sections[0]
+        pd_section = sender.sections[0]
+
+        admin_section = RegistrationFormSection(
+            registration_form=sender,
+            title="Official Use Only",
+            is_manager_only=True,  # <--- THIS IS ALLOWED (Type is Section)
+            position=1000,  # Put it at the bottom
+            is_enabled=True,
+        )
+        sender.sections.append(admin_section)
 
         for idx, field_meta in enumerate(self.custom_fields, start=1):
+            field_name = field_meta["name"]
+            input_type = field_meta["input_type"]
+            is_required = field_meta["is_required"]
+            is_disabled = field_meta["is_disabled"]
+            if field_name == "country":
+                # Country field already exists, just enable it
+                country_field = next(
+                    (f for f in pd_section.children if f.title == "Country"), None
+                )
+                # If found, enable it and adjust its position
+                if country_field:
+                    country_field.position = idx
+                    country_field.is_enabled = True
+                    country_field.is_required = is_required
+                continue
+
+            target_section = admin_section if is_disabled else pd_section
+
             field = RegistrationFormField(
                 registration_form=sender,
-                parent=section_to_add,
+                parent=pd_section,
                 title=field_meta["title"],
-                input_type=field_meta["input_type"],
-                is_required=field_meta["is_required"],
+                input_type=input_type,
+                is_required=is_required,
                 position=idx,
             )
 
             field_data = {}
-            if field_meta["input_type"] in ("single_choice", "multi_choice"):
+            if input_type in ("single_choice", "multi_choice"):
                 field_data = {
                     "item_type": field_meta.get("item_type", "dropdown"),
                     "with_extra_slots": False,
@@ -204,7 +324,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
             field.data, versioned_data = field.field_impl.process_field_data(field_data)
             field.current_data = RegistrationFormFieldData(versioned_data=versioned_data)
 
-            section_to_add.children.append(field)
+            target_section.children.append(field)
 
             # Flush so we get IDs
             db.session.flush()  # pylint: disable=no-member
@@ -213,7 +333,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
             db.session.add(  # pylint: disable=no-member
                 CustomFieldMapping(
                     regform_id=sender.id,
-                    field_name=field_meta["name"],
+                    field_name=field_name,
                     field_id=field.html_field_name,
                 )
             )
