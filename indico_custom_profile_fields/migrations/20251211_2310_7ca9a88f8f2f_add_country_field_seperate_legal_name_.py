@@ -3,10 +3,10 @@
 # Copyright 2025 Canonical Ltd.
 # See LICENSE file for licensing details.
 
-"""Migration to separate legal name.
+"""Migration to separate legal name and remove obsolete surname mapping.
 
-Separate legal name into first and last name.
-Remove field_surname from mapping as it is unnecessary.
+Separate the existing legal_name field into legal_first and legal_last fields.
+Remove field_surname from the custom_field_mapping table as it is unnecessary
 
 Revision ID: 7ca9a88f8f2f
 Revises: 3b609596bb71

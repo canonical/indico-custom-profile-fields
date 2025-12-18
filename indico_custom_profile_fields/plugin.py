@@ -138,7 +138,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
         """Handle custom profile field updates after personal data update."""
         # Get the form data from the request
         if sender is not RHPersonalDataUpdate:
-            print("Not a personal data update request, skipping.")
+            self.logger.info("Not a personal data update request, skipping.")
             return
         form_data = cast(dict, request.json)
         rh = kwargs.get("rh")  # type: RHPersonalDataUpdate
@@ -164,7 +164,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
         """Silently attach admin-only data after registration is created."""
         user = registration.user
         if not user:
-            print("No user found, skipping custom profile injection")
+            self.logger.info("No user found, skipping custom profile injection")
             return
 
         # Fetch custom profile
@@ -211,7 +211,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
         # Grab the user from kwargs
         user = args.args[1]
         if not user:
-            print("No user found, skipping custom profile injection")
+            self.logger.info("No user found, skipping custom profile injection")
             return user_data
 
         # Fetch custom profile
@@ -230,7 +230,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
             field_type = field_def["input_type"]
             field_id = mappings.get(field_name)  # e.g. "field_347"
 
-            if field_type != "country" and not field_id:
+            if field_type != "country" or not field_id:
                 # The field was not created in the regform
                 continue
 
@@ -331,11 +331,11 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
         """Format a value based on its input type.
 
         Args:
-            value (str): The value to format.
+            value (str | list[str]): The value to format.
             input_type (str): The type of input (e.g., 'single_choice', 'multi_choice', 'country').
 
         Returns:
-            str: The formatted value.
+            str | dict: The formatted value.
         """
         if input_type == "single_choice":
             # Single Choice must be stored as {'choice_id': 1}
