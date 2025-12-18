@@ -278,7 +278,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
 
             field = RegistrationFormField(
                 registration_form=sender,
-                parent=pd_section,
+                parent=target_section,
                 title=field_meta["title"],
                 input_type=input_type,
                 is_required=is_required,
