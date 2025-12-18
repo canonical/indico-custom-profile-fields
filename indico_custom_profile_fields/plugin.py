@@ -230,7 +230,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
             field_type = field_def["input_type"]
             field_id = mappings.get(field_name)  # e.g. "field_347"
 
-            if field_type != "country" or not field_id:
+            if field_type != "country" and not field_id:
                 # The field was not created in the regform
                 continue
 
