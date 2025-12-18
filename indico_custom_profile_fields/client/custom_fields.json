@@ -34,7 +34,7 @@
     "title": "Employee ID",
     "input_type": "text",
     "is_required": true,
-    "is_disabled": false
+    "is_disabled": true
   },
   {
     "name": "country",
