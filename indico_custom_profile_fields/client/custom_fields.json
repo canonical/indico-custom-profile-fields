@@ -4,14 +4,14 @@
     "title": "Legal First Name",
     "input_type": "text",
     "is_required": true,
-    "is_disabled": false
+    "admin_only": false
   },
   {
     "name": "legal_last",
     "title": "Legal Last Name",
     "input_type": "text",
     "is_required": true,
-    "is_disabled": false
+    "admin_only": false
   },
   {
     "name": "pronouns",
@@ -19,7 +19,7 @@
     "input_type": "text",
     "is_required": false,
     "description": "Please add any pronouns you would like printed on your name badge in the format She/Her, He/Him, They/Them",
-    "is_disabled": false
+    "admin_only": false
   },
   {
     "name": "nickname",
@@ -27,28 +27,28 @@
     "input_type": "text",
     "is_required": false,
     "description": "As you would like this printed on your name badge",
-    "is_disabled": false
+    "admin_only": false
   },
   {
     "name": "employee_id",
     "title": "Employee ID",
     "input_type": "text",
     "is_required": true,
-    "is_disabled": true
+    "admin_only": true
   },
   {
     "name": "country",
     "title": "Country",
     "input_type": "country",
     "is_required": true,
-    "is_disabled": false
+    "admin_only": false
   },
   {
     "name": "group",
     "title": "Group",
     "input_type": "text",
     "is_required": false,
-    "is_disabled": false
+    "admin_only": false
   },
   {
     "name": "product",
@@ -56,14 +56,14 @@
     "input_type": "text",
     "is_required": false,
     "description": "Please confirm how your team name should be formatted on your name badge with your manager, for consistency.",
-    "is_disabled": false
+    "admin_only": false
   },
   {
     "name": "shirt_size",
     "title": "T-Shirt Size",
     "input_type": "single_choice",
     "is_required": true,
-    "is_disabled": false,
+    "admin_only": false,
     "choices": [
         {"id": "f493d4eb-41fd-441a-848b-935414a7aaca", "caption": "No T-Shirt"},
         {"id": "055ace69-90e7-4d62-8fa7-a4187ea10184", "caption": "Women's XS"},
@@ -89,7 +89,7 @@
     "title": "Dietary Options",
     "input_type": "multi_choice",
     "is_required": false,
-    "is_disabled": false,
+    "admin_only": false,
     "choices": [
         {"id": "86ba4e2e-7bc9-48a3-b260-4a6590cf5d3e", "caption": "N/A"},
         {"id": "14f0331a-783d-4737-87c5-e33d42d86235", "caption": "Allergy (Give Details Below)"},
@@ -109,13 +109,13 @@
     "title": "Allergy/Dietary Details",
     "input_type": "text",
     "is_required": false,
-    "is_disabled": false
+    "admin_only": false
   },
   {
     "name": "cap_details",
     "title": "CAP Details",
     "input_type": "textarea",
     "is_required": false,
-    "is_disabled": true
+    "admin_only": true
   }
 ]

@@ -49,7 +49,7 @@ export default function CustomFields() {
   return (
     <>
       {customFields.map(field => {
-        const isDisabled = field.is_disabled && !isAdmin;
+        const isDisabled = field.admin_only && !isAdmin;
         if (field.input_type === 'text' || field.input_type === 'textarea') {
           return (
             <FinalInput

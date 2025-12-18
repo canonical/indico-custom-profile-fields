@@ -177,7 +177,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
 
         for field_def in self.custom_fields:
             # We ONLY care about Admin fields here
-            if not field_def.get("is_disabled", False):
+            if not field_def.get("admin_only", False):
                 continue
 
             field_name = field_def["name"]
@@ -222,7 +222,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
 
         # Inject custom fields into user_data
         for field_def in self.custom_fields:
-            if field_def.get("is_disabled", False):
+            if field_def.get("admin_only", False):
                 # Skip admin-only fields
                 continue
 
@@ -261,7 +261,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
             field_name = field_meta["name"]
             input_type = field_meta["input_type"]
             is_required = field_meta["is_required"]
-            is_disabled = field_meta["is_disabled"]
+            admin_only = field_meta["admin_only"]
             if field_name == "country":
                 # Country field already exists, just enable it
                 country_field = next(
@@ -274,7 +274,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
                     country_field.is_required = is_required
                 continue
 
-            target_section = admin_section if is_disabled else pd_section
+            target_section = admin_section if admin_only else pd_section
 
             field = RegistrationFormField(
                 registration_form=sender,
