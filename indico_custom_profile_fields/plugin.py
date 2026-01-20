@@ -31,7 +31,7 @@ from typing import Any, Callable, cast
 from flask import Blueprint, jsonify, request, session
 from indico.core import signals
 from indico.core.db import db
-from indico.core.plugins import IndicoPlugin
+from indico.core.plugins import IndicoPlugin, render_plugin_template
 from indico.modules.events.registration.models.form_fields import (
     RegistrationFormField,
     RegistrationFormFieldData,
@@ -93,6 +93,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
         """
         super().init()
         self.inject_bundle("main.js")
+        self.inject_bundle("main.css")
         self.custom_fields = self._load_custom_fields()
 
         # PROFILE PAGE HOOKS #
@@ -116,6 +117,14 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
         )
         # Hook into registration creation to attach admin-only data
         signals.event.registration_created.connect(self._attach_admin_data)
+
+        # TEST
+        signals.rh.process.connect(self._test_hook)
+
+    def _test_hook(self, sender: Any, **kwargs: Any) -> str:
+        print("TEST HOOK CALLED:", sender, kwargs.keys())
+        print(sender)
+        print(type(sender))
 
     def _prefill_custom_fields(self, _: Any, **kwargs: Any) -> None:
         """Prefill custom fields on the profile page."""
