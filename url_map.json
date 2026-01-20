@@ -32036,6 +32036,121 @@
         }
       ]
     },
+    "event_registration.api_checkin_registration_picture": {
+      "endpoint": "event_registration.api_checkin_registration_picture",
+      "rules": [
+        {
+          "args": [
+            "event_id",
+            "field_data_id",
+            "filename",
+            "reg_form_id",
+            "registration_id"
+          ],
+          "converters": {
+            "event_id": "IntegerConverter",
+            "field_data_id": "IntegerConverter",
+            "reg_form_id": "IntegerConverter",
+            "registration_id": "IntegerConverter"
+          },
+          "defaults": {},
+          "trace": [
+            {
+              "data": "|",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "api",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "checkin",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "forms",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "reg_form_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "registrations",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "registration_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "picture",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "field_data_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "filename",
+              "isDynamic": true
+            }
+          ]
+        }
+      ]
+    },
     "event_registration.api_checkin_registration_uuid": {
       "endpoint": "event_registration.api_checkin_registration_uuid",
       "rules": [
@@ -32164,6 +32279,264 @@
             },
             {
               "data": "/",
+              "isDynamic": false
+            }
+          ]
+        }
+      ]
+    },
+    "event_registration.api_invitations_import": {
+      "endpoint": "event_registration.api_invitations_import",
+      "rules": [
+        {
+          "args": [
+            "event_id",
+            "reg_form_id"
+          ],
+          "converters": {
+            "event_id": "IntegerConverter",
+            "reg_form_id": "IntegerConverter"
+          },
+          "defaults": {},
+          "trace": [
+            {
+              "data": "|",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "api",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "registration",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "reg_form_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "invitations",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "invite",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "import",
+              "isDynamic": false
+            }
+          ]
+        }
+      ]
+    },
+    "event_registration.api_invitations_import_upload": {
+      "endpoint": "event_registration.api_invitations_import_upload",
+      "rules": [
+        {
+          "args": [
+            "event_id",
+            "reg_form_id"
+          ],
+          "converters": {
+            "event_id": "IntegerConverter",
+            "reg_form_id": "IntegerConverter"
+          },
+          "defaults": {},
+          "trace": [
+            {
+              "data": "|",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "api",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "registration",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "reg_form_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "invitations",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "import",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "upload",
+              "isDynamic": false
+            }
+          ]
+        }
+      ]
+    },
+    "event_registration.api_invitations_metadata": {
+      "endpoint": "event_registration.api_invitations_metadata",
+      "rules": [
+        {
+          "args": [
+            "event_id",
+            "reg_form_id"
+          ],
+          "converters": {
+            "event_id": "IntegerConverter",
+            "reg_form_id": "IntegerConverter"
+          },
+          "defaults": {},
+          "trace": [
+            {
+              "data": "|",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "api",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "registration",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "reg_form_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "invitations",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "invite",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "metadata",
               "isDynamic": false
             }
           ]
@@ -34549,8 +34922,8 @@
         }
       ]
     },
-    "event_registration.import": {
-      "endpoint": "event_registration.import",
+    "event_registration.invitation_preview": {
+      "endpoint": "event_registration.invitation_preview",
       "rules": [
         {
           "args": [
@@ -34612,15 +34985,7 @@
               "isDynamic": false
             },
             {
-              "data": "invitations",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "import",
+              "data": "invitation-preview",
               "isDynamic": false
             }
           ]
@@ -35252,6 +35617,66 @@
             },
             {
               "data": "managers",
+              "isDynamic": false
+            }
+          ]
+        }
+      ]
+    },
+    "event_registration.manage_registration_multi_forms_announcement": {
+      "endpoint": "event_registration.manage_registration_multi_forms_announcement",
+      "rules": [
+        {
+          "args": [
+            "event_id"
+          ],
+          "converters": {
+            "event_id": "IntegerConverter"
+          },
+          "defaults": {},
+          "trace": [
+            {
+              "data": "|",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "manage",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "registration",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "description",
               "isDynamic": false
             }
           ]
@@ -50101,6 +50526,54 @@
         }
       ]
     },
+    "plugin_custom_profile_fields.get_config_api": {
+      "endpoint": "plugin_custom_profile_fields.get_config_api",
+      "rules": [
+        {
+          "args": [],
+          "converters": {},
+          "defaults": {},
+          "trace": [
+            {
+              "data": "|",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "plugin",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "custom_profile_fields",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "api",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "config",
+              "isDynamic": false
+            }
+          ]
+        }
+      ]
+    },
     "plugins.details": {
       "endpoint": "plugins.details",
       "rules": [
@@ -64408,6 +64881,50 @@
         }
       ]
     },
+    "tracks.program_json": {
+      "endpoint": "tracks.program_json",
+      "rules": [
+        {
+          "args": [
+            "event_id"
+          ],
+          "converters": {
+            "event_id": "IntegerConverter"
+          },
+          "defaults": {},
+          "trace": [
+            {
+              "data": "|",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "program.json",
+              "isDynamic": false
+            }
+          ]
+        }
+      ]
+    },
     "tracks.program_pdf": {
       "endpoint": "tracks.program_pdf",
       "rules": [
@@ -68299,5 +68816,5 @@
       ]
     }
   },
-  "version": "5a704a0de2d120f580108a959b1ae843"
+  "version": "93527025a43d2a32096a993bbc75b643"
 }
