@@ -24,6 +24,7 @@ These fields are automatically added to new registration forms and can be
 prefilled on user profile pages. The plugin also handles saving updates to
 these fields when users update their personal data.
 """
+
 import json
 import os
 from typing import Any, Callable, cast
