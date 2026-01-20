@@ -6,7 +6,7 @@ on:
 jobs:
   license-headers-check:
     name: Check license headers
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
       - name: Check .licenserc.yaml exists
@@ -23,7 +23,7 @@ jobs:
 
   lint-and-unit-test:
     name: Lint and unit tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
 
