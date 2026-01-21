@@ -31,7 +31,7 @@ from typing import Any, Callable, cast
 from flask import Blueprint, jsonify, request, session
 from indico.core import signals
 from indico.core.db import db
-from indico.core.plugins import IndicoPlugin, render_plugin_template
+from indico.core.plugins import IndicoPlugin
 from indico.modules.events.registration.models.form_fields import (
     RegistrationFormField,
     RegistrationFormFieldData,
