@@ -118,14 +118,6 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
         # Hook into registration creation to attach admin-only data
         signals.event.registration_created.connect(self._attach_admin_data)
 
-        # TEST
-        signals.rh.process.connect(self._test_hook)
-
-    def _test_hook(self, sender: Any, **kwargs: Any) -> str:
-        print("TEST HOOK CALLED:", sender, kwargs.keys())
-        print(sender)
-        print(type(sender))
-
     def _prefill_custom_fields(self, _: Any, **kwargs: Any) -> None:
         """Prefill custom fields on the profile page."""
         orig = cast(list[Any], kwargs.get("orig"))
