@@ -1,2 +1,5 @@
-recursive-include indico_customprofilefields/models *
-recursive-include indico_customprofilefields/migrations *
+graft indico_custom_profile_fields/client
+graft indico_custom_profile_fields/static
+graft indico_custom_profile_fields/migrations
+graft indico_custom_profile_fields/templates
+global-exclude *.pyc __pycache__ .keep

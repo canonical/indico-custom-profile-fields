@@ -9,7 +9,7 @@ import {
   parsers as p,
 } from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
-import customFields from './custom_fields.json';
+import customFields from '../custom_fields.json';
 import indicoAxios from 'indico/utils/axios';
 
 /*

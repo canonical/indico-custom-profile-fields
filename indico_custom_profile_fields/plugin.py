@@ -24,6 +24,7 @@ These fields are automatically added to new registration forms and can be
 prefilled on user profile pages. The plugin also handles saving updates to
 these fields when users update their personal data.
 """
+
 import json
 import os
 from typing import Any, Callable, cast
@@ -323,7 +324,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
 
     def _load_custom_fields(self) -> list[dict]:
         """Load custom fields from JSON file."""
-        json_path = os.path.join(os.path.dirname(__file__), "client/custom_fields.json")
+        json_path = os.path.join(os.path.dirname(__file__), "./custom_fields.json")
         with open(json_path, encoding="utf-8") as f:
             return json.load(f)
 
