@@ -1,5 +1,9 @@
 # Changelog
 
+### 2026-01-20
+
+- Disable the withdraw button on the registration summary page after the user submits the registration form.
+
 ### 2025-12-18
 
 - Separate the field "Legal Name" into "Legal First Name" and "Legal Last Name".

@@ -94,6 +94,7 @@ class CustomProfileFieldsPlugin(IndicoPlugin):
         """
         super().init()
         self.inject_bundle("main.js")
+        self.inject_bundle("main.css")
         self.custom_fields = self._load_custom_fields()
 
         # PROFILE PAGE HOOKS #

@@ -2,8 +2,8 @@
 // See LICENSE file for licensing details.
 
 import {registerPluginComponent} from 'indico/utils/plugins';
-
 import CustomFields from './customFieldForms';
+import './disableWithdrawButton.scss';
 
 /*
   Register the custom fields component for the user personal data form.
