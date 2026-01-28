@@ -30,7 +30,7 @@ On top of the new fields, the plugin now hides the "Withdraw" button from the re
 
 ## Motivation
 
-Currently, the only user information stored in the database are the fields in the profile page and only those fields come prefilled to the event registration form. However, the listed fields above are also requested in every event registration form, and the users have to re-enter these details at every event as the information provided are not stored in the Indico's database. With this plug-in, these new fields will be available to be updated in the profile page, and users will be able to update these fields in their profile page, and they will be prefilled in the event registration forms.
+Currently, the only user information stored in the database are the fields in the profile page and only those fields come pre-filled to the event registration form. However, the listed fields above are also requested in every event registration form, and the users have to re-enter these details at every event as the information provided are not stored in the Indico's database. With this plug-in, these new fields will be available to be updated in the profile page, and users will be able to update these fields in their profile page, and they will be pre-filled in the event registration forms.
 
 ## How it works
 
@@ -50,7 +50,7 @@ The plugin supports two admin-only fields: CAP Details and Employee ID. These fi
 
 ### Copying field values from profile to registration form
 
-Indico hooks access form fields via their unique IDs (generated upon creation) rather than their names. Therefore, the plugin cannot automatically link a profile field to a registration form field based solely on the name. To solve this, the plugin explicitly creates the fields and stores a `{field_name: field_id}`. 
+Indico hooks access form fields using their unique IDs (generated upon creation) rather than their names. Therefore, the plugin cannot automatically link a profile field to a registration form field based solely on the name. To solve this, the plugin explicitly creates the fields and stores a `{field_name: field_id}`. 
 
 The process operates as follows:
 
@@ -76,7 +76,7 @@ To install the plugin, switch to the virtual environment of Indico:
 source /path/to/yourindico/env/bin/activate
 ```
 
-Then, clone this repository and install the package via pip:
+Then, clone this repository and install the package with pip:
 ```
 cd /path/to/indico-custom-profile-fields
 pip install .
