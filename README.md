@@ -30,7 +30,7 @@ On top of the new fields, the plugin now hides the "Withdraw" button from the re
 
 ## Motivation
 
-Currently, the only user information stored in the database are the fields in the profile page and only those fields come pre-filled to the event registration form. However, the listed fields above are also requested in every event registration form, and the users have to re-enter these details at every event as the information provided are not stored in the Indico's database. With this plug-in, these new fields will be available to be updated in the profile page, and users will be able to update these fields in their profile page, and they will be pre-filled in the event registration forms.
+Currently, the only user information stored in the database are the fields in the profile page, and only those fields come pre-filled to the event registration form. However, the listed fields above are also requested in every event registration form, and the users have to re-enter these details at every event as the information provided are not stored in Indico's database. With this plugin, these new fields will be available to be updated in the profile page, users will be able to update these fields in their profile page, and they will be pre-filled in the event registration forms.
 
 ## How it works
 
