@@ -58,7 +58,7 @@ The process operates as follows:
 
 2. **Mapping**: The plugin stores a specific link between the Profile Field Name and the new Registration Form Field ID in the database.
 
-3. **Copying**: When a user opens the form, the plugin uses this stored mapping to copy values from the profile to the correct registration field.
+3. **Copying**: When a user opens the form, the plugin uses the stored mapping to copy values from the profile to the correct registration field.
 
 **Important limitation: Do not delete the fields created by the plugin.** The mapping relies entirely on the specific ID generated during the plugin's initial creation process. If an admin deletes a field and manually re-adds it — even with the exact same name and settings — Indico will generate a new ID. This breaks the link, and data will no longer be copied from the user's profile. Admins are free to add or remove any fields that the plugin does not interact with.
 
