@@ -46,7 +46,7 @@ When an admin creates a registration form, the added fields are automatically ad
 
 ### Admin-only fields
 
-The plugin supports two admin-only fields: CAP Details and Employee ID. These fields are not editable by regular users on their profiles, and can only be edited by the admins. Moreover, these fields are considered sensitive and are hidden in the registration form so that regular users can't see and interact with these fields. However, admin-only fields are silently added to the registration forms, and the values from the profile fields are copied to the registration form when the form is submitted. From the user side, nothing is visible and all of these operations are silently handled.
+The plugin supports two admin-only fields: CAP Details and Employee ID. These fields are not editable by regular users on their profiles; they can only be edited by the admins. Moreover, these fields are considered sensitive and are hidden in the registration form so that regular users can't see and interact with these fields. Admin-only fields are silently added to the registration forms, and the values from the profile fields are copied to the registration form when the form is submitted. 
 
 ### Copying field values from profile to registration form
 
