@@ -64,7 +64,7 @@ The process operates as follows:
 
 ### Hidden withdraw button
 
-Currently, there is no way to keep the "Modify" button but hide the "Withdraw" button from the registration page, after a registration is submitted. This plugin hides the "Withdraw" button so that it is possible to enable modifying without giving users the ability to withdraw their registration. Note that with this plugin active, there is no way to re-enable the withdraw button.
+After a registration is submitted, there is currently no way to display the "Modify" button but hide the "Withdraw" button from the registration page. This plugin hides the "Withdraw" button so that it is possible to enable modifying without giving users the ability to withdraw their registration. Note that with this plugin active, there is no way to re-enable the "Withdraw" button.
 
 ## Installation
 
