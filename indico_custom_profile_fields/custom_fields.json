@@ -33,7 +33,7 @@
     "name": "employee_id",
     "title": "Employee ID",
     "input_type": "text",
-    "is_required": true,
+    "is_required": false,
     "admin_only": true
   },
   {
