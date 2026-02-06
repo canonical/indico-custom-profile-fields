@@ -1,5 +1,9 @@
 # Changelog
 
+### 2026-02-06
+
+- Make Employee ID a non-required field in profile page.
+
 ### 2026-01-29
 
 - docs: The README is updated to include new features and all implementation details relevant to the plugin users. 
