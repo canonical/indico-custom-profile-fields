@@ -2,7 +2,7 @@
 name = 'indico-plugin-custom-profile-fields'
 description = 'Indico plugin to add admin-defined custom fields to user profiles'
 readme = 'README.md'
-version = '1.2.0'
+version = '1.2.1'
 license = 'MIT'
 authors = [{ name = 'Doğay Kamar', email = 'dogay.kamar@canonical.com' }]
 requires-python = '>=3.12.2, <3.13'
